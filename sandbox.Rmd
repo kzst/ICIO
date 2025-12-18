@@ -1,0 +1,1449 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r libraries,echo=FALSE,warning=FALSE,message=FALSE}
+library(knitr)
+library(nda)
+library(ggplot2)
+library(reshape2)
+library(lmtest)
+library(aod)
+library(dynlm)
+library(vars)
+library(igraph)
+library(leidenAlg)
+library(RColorBrewer)
+library(pheatmap)
+library(biclust)
+library(iBBiG)
+library(matrixStats)
+```
+
+```{r dataloads,echo=FALSE,warning=FALSE,message=FALSE}
+load("data/2D_NETWPROP_TIME_1_X.RData")
+load("data/3D_var_sect_time_1.RData")
+load("data/3D_var_secttr_time_1_X.RData")
+load("data/4D_var_Sect_Country_time_1.RData")
+```
+
+```{r netwp,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Network properties in time",fig.subcap=c("Degree- and betweenness centralizations","Resilience for random and systematic attacks","Average and global local efficiency and transitivity","PageRank centralizations and reach club cefficients","Modularity measures","Average aggregated and multilayer path lengths","Density, asymmetry and assortativity","Centralizations and global clustering","Average similarity values"),fig.ncol=3,out.width = '33%',fig.pos="H"}
+#i<-8
+#matplot(X_2D_NETWPROP_TIME_1[,31:36],type = "l",ylab = "Values",xlab="Years",axes=F)
+#TimePoints<-as.numeric(rownames(X_2D_NETWPROP_TIME_1))
+#axis(2)
+#axis(side=1,1:length(TimePoints),labels=TimePoints)
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(2:4)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Trade related structural measures",
+       x = "Year",
+       y = "Value",
+       color = "Trade related structural measures") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(21,22)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Resilience measures",
+       x = "Year",
+       y = "Value",
+       color = "Resilience measures") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(17:18,20)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Clustering and efficiency measures",
+       x = "Year",
+       y = "Value",
+       color = "Clustering and efficiency measures") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(6,24)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Prestigious structural measures",
+       x = "Year",
+       y = "Value",
+       color = "Prestigious structural measures") +
+  theme(legend.position="bottom")
+
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(32:35)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Modularity measures",
+       x = "Year",
+       y = "Value",
+       color = "Modularity measures") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(16,28)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Average Path lengths",
+       x = "Year",
+       y = "Value",
+       color = "Average Path Lengths") +
+  theme(legend.position="bottom")
+
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(1,14,23)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Structural indicators",
+       x = "Year",
+       y = "Value",
+       color = "Structural indicators") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(4,5,25)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Centralization and clustering indicators",
+       x = "Year",
+       y = "Value",
+       color = "Centralization clustering indicators") +
+  theme(legend.position="bottom")
+
+data<-cbind(as.numeric(rownames(X_2D_NETWPROP_TIME_1)),X_2D_NETWPROP_TIME_1[,c(37:41)])
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Mean of similarities",
+       x = "Year",
+       y = "Value",
+       color = "Mean of similarities") +
+  theme(legend.position="bottom")
+```
+
+
+
+```{r sectp,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Sectorial network properties",fig.subcap=c("Indegree centrality","Outdegree centrality","Homophyle","Leiden's modularity"),fig.ncol=2,out.width = '49%',fig.pos="H"}
+#i<-8
+#matplot(X_2D_NETWPROP_TIME_1[,31:36],type = "l",ylab = "Values",xlab="Years",axes=F)
+#TimePoints<-as.numeric(rownames(X_2D_NETWPROP_TIME_1))
+#axis(2)
+#axis(side=1,1:length(TimePoints),labels=TimePoints)
+tmp<-t(var_sect_time[2,,])
+data<-as.data.frame(cbind(as.numeric(rownames(tmp)),tmp))
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 1) +
+  labs(title = "",
+       x = "Year",
+       y = "Indegree centrality",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+
+tmp<-t(var_sect_time[3,,])
+data<-as.data.frame(cbind(as.numeric(rownames(tmp)),tmp))
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 1) +
+  labs(title = "",
+       x = "Year",
+       y = "Outdegree centrality",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+
+tmp<-t(var_sect_time[4,,]/var_sect_time[1,,])
+data<-as.data.frame(cbind(as.numeric(rownames(tmp)),tmp))
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 1) +
+  labs(title = "",
+       x = "Year",
+       y = "Homophyle value",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+
+tmp<-t(var_sect_time[13,,])
+data<-as.data.frame(cbind(as.numeric(rownames(tmp)),tmp))
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 1) +
+  labs(title = "",
+       x = "Year",
+       y = "Modularity value",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+```
+
+
+```{r sectpnda,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Sectorial clustered properties",fig.subcap=c("Outdegree centrality","Homophyle","Leiden's modularity"),fig.ncol=3,out.width = '33%',fig.pos="H"}
+#i<-8
+#matplot(X_2D_NETWPROP_TIME_1[,31:36],type = "l",ylab = "Values",xlab="Years",axes=F)
+#TimePoints<-as.numeric(rownames(X_2D_NETWPROP_TIME_1))
+#axis(2)
+#axis(side=1,1:length(TimePoints),labels=TimePoints)
+set.seed(2)
+
+tmp<-t(var_sect_time[3,,])
+NDA<-ndr(tmp)
+for (i in 1:NDA$factors){
+  if (i==1){
+    data<-cbind(as.numeric(rownames(tmp)),rowWeightedMeans(tmp[,NDA$membership==i],w=NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i]))
+  }else{
+    data<-cbind(data,rowWeightedMeans(tmp[,NDA$membership==i],w=NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i]))
+  }
+}
+data<-as.data.frame(data)
+colnames(data)[1]<-"Year"
+for (i in 1:NDA$factors){
+  colnames(data)[i+1]<-paste("NDA",i," (",paste(colnames(tmp)[NDA$membership==i],collapse = ', '),")",sep="")
+}
+
+data_melted<-melt(data,id.vars = "Year")
+data_melted <- data_melted %>%
+  mutate(variable = str_wrap(variable, width = 20))
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "",
+       x = "Year",
+       y = "Outdegree centrality",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+
+tmp<-t(var_sect_time[4,,]/var_sect_time[1,,])
+NDA<-ndr(tmp)
+for (i in 1:NDA$factors){
+  if (i==1){
+    data<-cbind(as.numeric(rownames(tmp)),rowWeightedMeans(tmp[,NDA$membership==i],w=abs(NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i])))
+  }else{
+    data<-cbind(data,rowWeightedMeans(tmp[,NDA$membership==i],w=abs(NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i])))
+  }
+}
+data<-as.data.frame(data)
+colnames(data)[1]<-"Year"
+for (i in 1:NDA$factors){
+  colnames(data)[i+1]<-paste("NDA",i," (",paste(colnames(tmp)[NDA$membership==i],collapse = ', '),")",sep="")
+}
+
+data_melted<-melt(data,id.vars = "Year")
+data_melted <- data_melted %>%
+  mutate(variable = str_wrap(variable, width = 20))
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "",
+       x = "Year",
+       y = "Homophyle value",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+
+tmp<-t(var_sect_time[13,,])
+NDA<-ndr(tmp)
+for (i in 1:NDA$factors){
+  if (i==1){
+    data<-cbind(as.numeric(rownames(tmp)),rowWeightedMeans(tmp[,NDA$membership==i],w=abs(NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i])))
+  }else{
+    data<-cbind(data,rowWeightedMeans(tmp[,NDA$membership==i],w=abs(NDA$loadings[cbind(seq_along(NDA$membership),NDA$membership)][NDA$membership==i])))
+  }
+}
+data<-as.data.frame(data)
+colnames(data)[1]<-"Year"
+for (i in 1:NDA$factors){
+  colnames(data)[i+1]<-paste("NDA",i," (",paste(colnames(tmp)[NDA$membership==i],collapse = ', '),")",sep="")
+}
+
+data_melted<-melt(data,id.vars = "Year")
+data_melted <- data_melted %>%
+  mutate(variable = str_wrap(variable, width = 20))
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "",
+       x = "Year",
+       y = "Modularity value",
+       color = "Sectors") +
+  theme(legend.position="bottom")
+```
+
+
+
+```{r nodepsect,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Mean sectorial modularity and centrality values in time",fig.subcap=c("Factorial scores of sectorial modules","Clustered correlation graph","Factor scores of degree and strength centralities","Factor scores of PRC, EC, HC, AC and Katz Centrality"),fig.ncol=2,out.width = '48%',fig.pos="H"}
+#i<-8
+#matplot(X_2D_NETWPROP_TIME_1[,31:36],type = "l",ylab = "Values",xlab="Years",axes=F)
+#TimePoints<-as.numeric(rownames(X_2D_NETWPROP_TIME_1))
+#axis(2)
+#axis(side=1,1:length(TimePoints),labels=TimePoints)
+set.seed(2)
+DATA<-t(var_sect_time[13,,])
+#NDA<-ndr(1-normalize(as.matrix(dist(t(DATA)))),covar = TRUE)
+NDA<-ndr(DATA)
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA))
+data<-as.data.frame(cbind(as.numeric(rownames(NDA$scores)),NDA$scores))
+colnames(data)[1]<-"Year"
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Factor scores in time of Louvain's modularity value",
+       x = "Year",
+       y = "Value",
+       color = "Latent variables") + scale_color_manual(values=c("#22BB22", "#2222BB", "#BB2222")) +
+  theme(legend.position="bottom")
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(NDA,interactive = FALSE,cuts=0.6,labeldist = 0)
+
+#NDA
+
+#i<-1
+#DATA<-t(var_sect_time[13,,])
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA[,colnames(DATA)[NDA$membership==i]]))
+#colnames(data)[1]<-"Year"
+#data_melted<-melt(data,id.vars = "Year")
+#ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+#  geom_line(size = 0.7) +
+#  labs(title = paste("Sectors belongs to NDA",i,sep=""),
+#       x = "Year",
+#       y = "Value",
+#       color = "Sectors") +
+#  theme(legend.position="bottom")
+#i<-2
+#DATA<-t(var_sect_time[13,,])
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA[,colnames(DATA)[NDA$membership==i]]))
+#colnames(data)[1]<-"Year"
+#data_melted<-melt(data,id.vars = "Year")
+#ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+#  geom_line(size = 0.7) +
+#  labs(title = paste("Sectors belongs to NDA",i,sep=""),
+#       x = "Year",
+#       y = "Value",
+#       color = "Sectors") +
+#  theme(legend.position="bottom")
+#
+
+#i<-3
+#DATA<-t(var_sect_time[13,,])
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA[,colnames(DATA)[NDA$membership==i]]))
+#colnames(data)[1]<-"Year"
+#data_melted<-melt(data,id.vars = "Year")
+#ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+#  geom_line(size = 0.7) +
+#  labs(title = paste("Sectors belongs to NDA",i,sep=""),
+#       x = "Year",
+#       y = "Value",
+#       color = "Sectors") +
+#  theme(legend.position="bottom")
+
+for (i in c(15,16,18,19)){
+  DATA<-t(var_sect_time[i,,])
+  NDA_DEG<-ndr(DATA)
+  if (i==15){
+    NDA_DATA<-NDA_DEG$scores
+  }else{
+    NDA_DATA<-cbind(NDA_DATA,NDA_DEG$scores)
+  }
+}
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA))
+data<-as.data.frame(cbind(as.numeric(rownames(NDA_DATA)),NDA_DATA))
+colnames(data)<-c("Year",dimnames(var_sect_time)[[1]][c(15,16,18,19)])
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Factor scores in time of sectorial centralities",
+       x = "Year",
+       y = "Value",
+       color = "Latent variables") +
+  theme(legend.position="bottom")
+
+for (i in c(20:24)){
+  DATA<-t(var_sect_time[i,,])
+  NDA_DEG<-ndr(DATA)
+  if (i==20){
+    NDA_DATA<-NDA_DEG$scores
+  }else{
+    NDA_DATA<-cbind(NDA_DATA,NDA_DEG$scores)
+  }
+}
+
+#data<-as.data.frame(cbind(as.numeric(rownames(DATA)),DATA))
+data<-as.data.frame(cbind(as.numeric(rownames(NDA_DATA)),NDA_DATA))
+colnames(data)<-c("Year",dimnames(var_sect_time)[[1]][c(20:24)])
+data_melted<-melt(data,id.vars = "Year")
+ggplot(data_melted, aes(x = Year, y = value, color = variable)) +
+  geom_line(size = 2) +
+  labs(title = "Factor scores in time of sectorial centralities",
+       x = "Year",
+       y = "Value",
+       color = "Latent variables") +
+  theme(legend.position="bottom")
+
+```
+
+
+```{r causnetwp,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Causalities between network properies",fig.subcap=c("Granger causality","Instantaneous causality","Clustered Granger causality graph","Clustered instantaneous causality graph"),fig.ncol=2,out.width = '48%',fig.pos="H",results='hide'}
+N<-ncol(X_2D_NETWPROP_TIME_1)
+p<-0.01
+FILENAME<-"data/CAUS_NETWP.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  
+  INSTANT<-GRANGER<-as.data.frame(matrix(0,nrow = N,ncol = N))
+  rownames(INSTANT)<-rownames(GRANGER)<-colnames(INSTANT)<-colnames(GRANGER)<-colnames(X_2D_NETWPROP_TIME_1)
+  for (i in 1:N){
+    for (j in 1:N){
+      if (i != j){
+        ts1<-ts(as.numeric(as.matrix(X_2D_NETWPROP_TIME_1[,i])),start=1995,end=2020)
+        ts2<-ts(as.numeric(as.matrix(X_2D_NETWPROP_TIME_1[,j])),start=1995,end=2020)
+        tsDat<-ts.union(ts1,ts2)
+        k<-1
+        while (TRUE)
+        {
+          tsVAR <- vars::VAR(tsDat, p = k)
+          p_g<-as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value)
+          if (is.na(p_g)) {p_g<-1}
+          if (p_g<p){
+            GRANGER[i,j]<-k
+            break
+          }
+          if (k>4){
+            break
+          }
+          k<-k+1
+        }
+        k<-1
+        while (TRUE)
+        {
+          tsVAR <- vars::VAR(tsDat, p = k)
+          p_i<-as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value)
+          if (is.na(p_i)) {p_i<-1}
+          if (p_i<p){
+            INSTANT[i,j]<-1
+            GRANGER[i,j]<-0
+            break
+          }
+          if (k>4){
+            break
+          }
+          k<-k+1
+        }
+        
+      }
+    }
+  }
+  
+  save(GRANGER,INSTANT,file = FILENAME)
+}
+g_GRANGER<-graph_from_adjacency_matrix(as.matrix(GRANGER),mode="directed",weighted = TRUE)
+
+g_INSTANT<-graph_from_adjacency_matrix(as.matrix(INSTANT),mode="undirected",weighted = TRUE)
+
+el_INSTANT<-el_GRANGER<-as.data.frame(matrix(0,ncol=3,nrow=0))
+colnames(el_INSTANT)<-colnames(el_GRANGER)<-c("From","To","Value")
+k<-1
+for (i in 1:N){
+  for (j in 1:N){
+    el_INSTANT[k,1]<-el_GRANGER[k,1]<-rownames(GRANGER)[i]
+    el_INSTANT[k,2]<-el_GRANGER[k,2]<-colnames(GRANGER)[j]
+    el_GRANGER[k,3]<-GRANGER[i,j]
+    el_INSTANT[k,3]<-INSTANT[i,j]
+    k<-k+1
+  }
+}
+
+ggplot(el_GRANGER, aes(From, To, fill= Value)) + 
+    geom_tile()+
+  scale_fill_gradient2(name="Lag",low="white",mid="white",high="darkred") + 
+  
+  theme(
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1,
+      vjust = 0.5
+  ))
+
+ggplot(el_INSTANT, aes(From, To, fill= Value)) + 
+    geom_tile(show.legend = FALSE)+
+  scale_fill_gradient(name="Lag",low="white",high="darkred") + 
+  
+  theme(
+    axis.text.x = element_text(
+      angle = 90,
+      hjust = 1,
+      vjust = 0.5
+  ))
+
+
+
+BIN_GRANGER<-matrix(as.numeric(GRANGER>=1),nrow=nrow(GRANGER),ncol=ncol(GRANGER))
+colnames(BIN_GRANGER)<-colnames(GRANGER)
+rownames(BIN_GRANGER)<-rownames(GRANGER)
+BIN_INSTANT<-matrix(as.numeric(INSTANT>=1),nrow=nrow(INSTANT),ncol=ncol(INSTANT))
+colnames(BIN_INSTANT)<-colnames(INSTANT)
+rownames(BIN_INSTANT)<-rownames(INSTANT)
+
+res <- iBBiG(binaryMatrix=BIN_GRANGER,nModules = 2,alpha=1,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+ADJ_GRANGER_1<-BIN_GRANGER[res@RowxNumber[,1],res@NumberxCol[1,]]
+ADJ_GRANGER_2<-BIN_GRANGER[res@RowxNumber[,2],res@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_GRANGER))){
+  edge<-ends(g_GRANGER,i)
+  E(g_GRANGER)[i]$color<-"grey"
+  E(g_GRANGER)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_GRANGER_1)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_1)){
+      E(g_GRANGER)[i]$color<-colors[1]
+      E(g_GRANGER)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_GRANGER_2)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_2)){
+      E(g_GRANGER)[i]$color<-colors[2]
+      E(g_GRANGER)[i]$width<-2
+    }
+  }
+}
+
+mod<-leiden.community(g_GRANGER)$membership
+deg<-centr_degree(g_GRANGER,mode = "in")$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="") 
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_GRANGER,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*10+5,layout=layout.drl,edge.label=E(g_GRANGER)$weight)
+
+res <- iBBiG(binaryMatrix=BIN_INSTANT,nModules = 2,alpha=1,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+ADJ_INSTANT_1<-BIN_INSTANT[res@RowxNumber[,1],res@NumberxCol[1,]]
+ADJ_INSTANT_2<-BIN_INSTANT[res@RowxNumber[,2],res@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_INSTANT))){
+  edge<-ends(g_INSTANT,i)
+  E(g_INSTANT)[i]$color<-"grey"
+  E(g_INSTANT)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_INSTANT_1)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_1)){
+      E(g_INSTANT)[i]$color<-colors[1]
+      E(g_INSTANT)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_INSTANT_2)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_2)){
+      E(g_INSTANT)[i]$color<-colors[2]
+      E(g_INSTANT)[i]$width<-2
+    }
+  }
+}
+
+
+
+mod<-leiden.community(g_INSTANT)$membership
+deg<-centr_degree(g_INSTANT)$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="")
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_INSTANT,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*3+5)
+
+```
+
+
+
+```{r caussect,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Causalities between network properies",fig.subcap=c("Granger causality (0= no sig., 1-5: year lags)","Instantaneous ($\\circ$: no sig. \\darkred{$\\bullet$}: sig.) causality","Clustered Granger causality graph","Clustered instantaneous causality graph"),fig.ncol=2,out.width = '48%',fig.pos="H",results='hide'}
+sectdata<-as.data.frame(t(var_sect_time[4,,]/var_sect_time[1,,]))
+N<-ncol(sectdata)
+p<-0.01
+#FILENAME<-"data/CAUS_SECT.RData"
+#FILEEXISTS<-file.exists(FILENAME)
+#if (FILEEXISTS==TRUE){
+#  load(FILENAME)
+#}else{
+  
+  INSTANT_SECT<-GRANGER_SECT<-as.data.frame(matrix(0,nrow = N,ncol = N))
+  rownames(INSTANT_SECT)<-rownames(GRANGER_SECT)<-colnames(INSTANT_SECT)<-colnames(GRANGER_SECT)<-colnames(sectdata)
+  for (i in 1:N){
+    for (j in 1:N){
+      if (i != j){
+        ts1<-ts(as.numeric(as.matrix(sectdata[,i])),start=1995,end=2020)
+        ts2<-ts(as.numeric(as.matrix(sectdata[,j])),start=1995,end=2020)
+        tsDat<-ts.union(ts1,ts2)
+        k<-1
+        while (TRUE)
+        {
+          tsVAR <- vars::VAR(tsDat, p = k)
+          p_g<-as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value)
+          if (is.na(p_g)) {p_g<-1}
+          if (p_g<p){
+            GRANGER_SECT[i,j]<-k
+            break
+          }
+          if (k>4){
+            break
+          }
+          k<-k+1
+        }
+        k<-1
+        while (TRUE)
+        {
+          tsVAR <- vars::VAR(tsDat, p = k)
+          p_i<-as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value)
+          if (is.na(p_i)) {p_i<-1}
+          if (p_i<p){
+            INSTANT_SECT[i,j]<-1
+            GRANGER_SECT[i,j]<-0
+            break
+          }
+          if (k>4){
+            break
+          }
+          k<-k+1
+        }
+        
+      }
+    }
+  }
+  
+  #save(GRANGER_SECT,INSTANT_SECT,file = FILENAME)
+#}
+g_GRANGER_SECT<-graph_from_adjacency_matrix(as.matrix(GRANGER_SECT),mode="directed",weighted = TRUE)
+
+g_INSTANT_SECT<-graph_from_adjacency_matrix(as.matrix(INSTANT_SECT),mode="undirected",weighted = TRUE)
+
+
+#pheatmap(as.matrix(GRANGER),color=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"),fontsize = 8,fontsize_row = 6,cutree_cols = 6,cutree_rows = 4)
+
+
+#pheatmap(as.matrix(INSTANT),color=c("#FFEEEE","#993333"),legend_breaks = c(0,1),fontsize = 8,fontsize_row = 6,cutree_rows = 2,cutree_cols = 2)
+
+
+BIN_GRANGER_SECT<-matrix(as.numeric(GRANGER_SECT>=1),nrow=nrow(GRANGER_SECT),ncol=ncol(GRANGER_SECT))
+colnames(BIN_GRANGER_SECT)<-colnames(GRANGER_SECT)
+rownames(BIN_GRANGER_SECT)<-rownames(GRANGER_SECT)
+BIN_INSTANT_SECT<-matrix(as.numeric(INSTANT_SECT>=1),nrow=nrow(INSTANT_SECT),ncol=ncol(INSTANT_SECT))
+colnames(BIN_INSTANT_SECT)<-colnames(INSTANT_SECT)
+rownames(BIN_INSTANT_SECT)<-rownames(INSTANT_SECT)
+
+resG_SECT <- iBBiG(binaryMatrix=BIN_GRANGER_SECT,nModules = 2,alpha=0.3,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+par(mar = c(.1, 7, 7, 5.5), xpd = TRUE,cex=0.8) 
+heatmapBC(x=as.matrix(GRANGER_SECT),bicResult = resG_SECT,col=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"))
+legend("right",inset=c(-0.12,0),legend=c(0,1:5),col=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"),pch=15)
+
+ADJ_GRANGER_SECT_1<-BIN_GRANGER_SECT[resG_SECT@RowxNumber[,1],resG_SECT@NumberxCol[1,]]
+ADJ_GRANGER_SECT_2<-BIN_GRANGER_SECT[resG_SECT@RowxNumber[,2],resG_SECT@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_GRANGER_SECT))){
+  edge<-ends(g_GRANGER_SECT,i)
+  E(g_GRANGER_SECT)[i]$color<-"grey"
+  E(g_GRANGER_SECT)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_GRANGER_SECT_1)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_SECT_1)){
+      E(g_GRANGER_SECT)[i]$color<-colors[1]
+      E(g_GRANGER_SECT)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_GRANGER_SECT_2)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_SECT_2)){
+      E(g_GRANGER_SECT)[i]$color<-colors[2]
+      E(g_GRANGER_SECT)[i]$width<-2
+    }
+  }
+}
+
+resI_SECT <- iBBiG(binaryMatrix=BIN_INSTANT_SECT,nModules = 2,alpha=0.3,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+heatmapBC(x=as.matrix(INSTANT_SECT),bicResult = resI_SECT,col=c("#FFFFFF","#993333"))
+
+ADJ_INSTANT_SECT_1<-BIN_INSTANT_SECT[resI_SECT@RowxNumber[,1],resI_SECT@NumberxCol[1,]]
+ADJ_INSTANT_SECT_2<-BIN_INSTANT_SECT[resI_SECT@RowxNumber[,2],resI_SECT@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_INSTANT_SECT))){
+  edge<-ends(g_INSTANT_SECT,i)
+  E(g_INSTANT_SECT)[i]$color<-"grey"
+  E(g_INSTANT_SECT)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_INSTANT_SECT_1)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_SECT_1)){
+      E(g_INSTANT_SECT)[i]$color<-colors[1]
+      E(g_INSTANT_SECT)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_INSTANT_SECT_2)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_SECT_2)){
+      E(g_INSTANT_SECT)[i]$color<-colors[2]
+      E(g_INSTANT_SECT)[i]$width<-2
+    }
+  }
+}
+
+
+mod<-leiden.community(g_GRANGER_SECT)$membership
+deg<-centr_degree(g_GRANGER_SECT,mode = "in")$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="") 
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_GRANGER_SECT,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*10+5,layout=layout.drl,edge.label=E(g_GRANGER_SECT)$weight)
+
+
+mod<-leiden.community(g_INSTANT_SECT)$membership
+deg<-centr_degree(g_INSTANT_SECT)$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="")
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_INSTANT_SECT,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*3+5)
+
+```
+
+
+```{r top10ctry,echo=FALSE,warning=FALSE,message=FALSE,fig.align='center',fig.cap="Centrality values of top 10 countries",fig.subcap=c("Difference between weighted outdegree and inderee centralities","Relative PageRank centalities"),fig.ncol=2,out.width = '48%',fig.pos="H",results='hide'}
+
+D3_data<-var_sect_country_time[14,,,]
+data_melted<-as.data.frame(melt(D3_data,na.rm = TRUE))
+colnames(data_melted)<-c("Sector","Country","Year","value")
+maxvalues<-acast(data_melted,formula=Year~.,fun.aggregate = sum)
+selectctries<-sort(head(sort(acast(data_melted,formula=Country~.,fun.aggregate = sum),index.return=TRUE,decreasing = TRUE)$ix,n=11))[-11]
+D3_data<-var_sect_country_time[14,,selectctries,]
+data_melted<-as.data.frame(melt(D3_data))
+colnames(data_melted)<-c("Sector","Country","Year","value")
+ggplot(data_melted, aes(fill=Country, y=value, x=Year)) + 
+    geom_bar(position="stack", stat="identity") +
+  labs(title = "",
+       x = "Year",
+       y = "Weighted indegree centrality",
+       color = "Top 10 country") +
+  theme(legend.position="bottom")
+
+D3_data<-var_sect_country_time[15,,,]-var_sect_country_time[14,,,]
+data_melted<-as.data.frame(melt(D3_data,na.rm = TRUE))
+colnames(data_melted)<-c("Sector","Country","Year","value")
+maxvalues<-acast(data_melted,formula=Year~.,fun.aggregate = sum)
+selectctries<-sort(head(sort(abs(acast(data_melted,formula=Country~.,fun.aggregate = sum)),index.return=TRUE,decreasing = TRUE)$ix,n=11))[-11]
+D3_data<-var_sect_country_time[15,,selectctries,]-var_sect_country_time[14,,selectctries,]
+data_melted<-as.data.frame(melt(D3_data))
+colnames(data_melted)<-c("Sector","Country","Year","value")
+ggplot(data_melted, aes(fill=Country, y=value, x=Year)) + 
+    geom_bar(position="stack", stat="identity") +
+  labs(title = "",
+       x = "Year",
+       y = "Weighted outdegree - weighted indegree centrality",
+       color = "Top 10 country") +
+  theme(legend.position="bottom")
+
+D3_data<-var_sect_country_time[19,,,]
+data_melted<-as.data.frame(melt(D3_data))
+colnames(data_melted)<-c("Sector","Country","Year","value")
+maxvalues<-acast(data_melted,formula=Year~.,fun.aggregate = sum)
+D3_data<-var_sect_country_time[19,,sort(head(sort(acast(data_melted,formula=Country~.,fun.aggregate = sum),index.return=TRUE,decreasing = TRUE)$ix,n=11))[-11],]
+data_melted<-as.data.frame(melt(D3_data))
+colnames(data_melted)<-c("Sector","Country","Year","PageRank")
+for (i in 1:nrow(data_melted)){
+  data_melted$PageRank[i]<-data_melted$PageRank[i]/maxvalues[as.character(data_melted$Year[i]),]
+}
+ggplot(data_melted, aes(fill=Country, y=PageRank, x=Year)) + 
+    geom_bar(position="stack", stat="identity") +
+  labs(title = "",
+       x = "Year",
+       y = "Relative PageRank centrality value",
+       color = "Top 10 country") +
+  theme(legend.position="bottom")
+
+
+
+
+```
+
+
+Table \ref{tab:caustop5} shows the 5-5 countries/sectors whose trade is the first to respond to changes and which have the most country/sector followers. Table \ref{tab:caustop5} also shows the average time lags.
+
+
+```{r caustop5,echo=FALSE,warning=FALSE,message=FALSE}
+
+D3_data<-var_sect_country_time[3,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_DCO.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+g_GRANGER_SECT_CTRY<-graph_from_adjacency_matrix(as.matrix(GRANGER_SECT_CTRY),mode="directed",weighted = TRUE)
+
+g_INSTANT_SECT_CTRY<-graph_from_adjacency_matrix(as.matrix(INSTANT_SECT_CTRY),mode="undirected",weighted = TRUE)
+
+
+#pheatmap(as.matrix(GRANGER),color=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"),fontsize = 8,fontsize_row = 6,cutree_cols = 6,cutree_rows = 4)
+
+
+#pheatmap(as.matrix(INSTANT),color=c("#FFEEEE","#993333"),legend_breaks = c(0,1),fontsize = 8,fontsize_row = 6,cutree_rows = 2,cutree_cols = 2)
+
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+
+resG_SECT_CTRY <- iBBiG(binaryMatrix=BIN_GRANGER_SECT_CTRY,nModules = 2,alpha=1,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+par(mar = c(.1, 7, 7, 5.5), xpd = TRUE,cex=0.8) 
+heatmapBC(x=as.matrix(GRANGER_SECT_CTRY),bicResult = resG_SECT_CTRY,col=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"))
+legend("right",inset=c(-0.12,0),legend=c(0,1:5),col=c("#FFFFFF","#FFFFBB","#FFBB99","#FF8877","#BB4F44","#993333"),pch=15)
+
+ADJ_GRANGER_SECT_1<-BIN_GRANGER_SECT[resG_SECT@RowxNumber[,1],resG_SECT@NumberxCol[1,]]
+ADJ_GRANGER_SECT_2<-BIN_GRANGER_SECT[resG_SECT@RowxNumber[,2],resG_SECT@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_GRANGER_SECT))){
+  edge<-ends(g_GRANGER_SECT,i)
+  E(g_GRANGER_SECT)[i]$color<-"grey"
+  E(g_GRANGER_SECT)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_GRANGER_SECT_1)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_SECT_1)){
+      E(g_GRANGER_SECT)[i]$color<-colors[1]
+      E(g_GRANGER_SECT)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_GRANGER_SECT_2)){
+    if (edge[2] %in% colnames(ADJ_GRANGER_SECT_2)){
+      E(g_GRANGER_SECT)[i]$color<-colors[2]
+      E(g_GRANGER_SECT)[i]$width<-2
+    }
+  }
+}
+
+resI_SECT <- iBBiG(binaryMatrix=BIN_INSTANT_SECT,nModules = 2,alpha=0.3,pop_size = 100,mutation = 0.3,stagnation = 50,selection_pressure = 1.2,max_sp = 15,success_ratio = 0.8)
+
+heatmapBC(x=as.matrix(INSTANT_SECT),bicResult = resI_SECT,col=c("#FFFFFF","#993333"))
+
+ADJ_INSTANT_SECT_1<-BIN_INSTANT_SECT[resI_SECT@RowxNumber[,1],resI_SECT@NumberxCol[1,]]
+ADJ_INSTANT_SECT_2<-BIN_INSTANT_SECT[resI_SECT@RowxNumber[,2],resI_SECT@NumberxCol[2,]]
+colors=c("darkred","darkgreen")
+for (i in 1:length(E(g_INSTANT_SECT))){
+  edge<-ends(g_INSTANT_SECT,i)
+  E(g_INSTANT_SECT)[i]$color<-"grey"
+  E(g_INSTANT_SECT)[i]$width<-1
+  if (edge[1] %in% rownames(ADJ_INSTANT_SECT_1)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_SECT_1)){
+      E(g_INSTANT_SECT)[i]$color<-colors[1]
+      E(g_INSTANT_SECT)[i]$width<-2
+    }
+  }
+  if (edge[1] %in% rownames(ADJ_INSTANT_SECT_2)){
+    if (edge[2] %in% colnames(ADJ_INSTANT_SECT_2)){
+      E(g_INSTANT_SECT)[i]$color<-colors[2]
+      E(g_INSTANT_SECT)[i]$width<-2
+    }
+  }
+}
+
+
+mod<-leiden.community(g_GRANGER_SECT)$membership
+deg<-centr_degree(g_GRANGER_SECT,mode = "in")$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="") 
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_GRANGER_SECT,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*10+5,layout=layout.drl,edge.label=E(g_GRANGER_SECT)$weight)
+
+
+mod<-leiden.community(g_INSTANT_SECT)$membership
+deg<-centr_degree(g_INSTANT_SECT)$res
+coul  <- paste(brewer.pal(max(as.numeric(mod))+1, "Set1"),"80",sep="")
+
+par(mar=c(0.1,0.1,0.1,0.1),cex=0.55)
+plot(g_INSTANT_SECT,vertex.color=coul[mod],vertex.size=log(log(deg+1)+1)*3+5)
+
+```
+
+
+```{r caustop5,echo=FALSE,warning=FALSE,message=FALSE}
+
+#DCO
+D3_data<-var_sect_country_time[3,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_DCO.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+
+top5causDCO<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causDCO)<-c("Cty.Sect","Successors")
+top5causDCO<-as.data.frame(top5causDCO)
+top5causDCO$Successors<-as.numeric(top5causDCO$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causDCO),]
+#top5sel[top5sel==0]<-NA
+top5causDCO$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+
+#DCI
+
+D3_data<-var_sect_country_time[2,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_DCI.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+top5causDCI<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causDCI)<-c("Cty.Sect","Successors")
+top5causDCI<-as.data.frame(top5causDCI)
+top5causDCI$Successors<-as.numeric(top5causDCI$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causDCI),]
+#top5sel[top5sel==0]<-NA
+top5causDCI$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+#MutistrengthIn
+
+D3_data<-var_sect_country_time[14,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_SCI.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+top5causSCI<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causSCI)<-c("Cty.Sect","Successors")
+top5causSCI<-as.data.frame(top5causSCI)
+top5causSCI$Successors<-as.numeric(top5causSCI$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causSCI),]
+#top5sel[top5sel==0]<-NA
+top5causSCI$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+
+#MutistrengthOut
+
+D3_data<-var_sect_country_time[15,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_SCO.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+top5causSCO<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causSCO)<-c("Cty.Sect","Successors")
+top5causSCO<-as.data.frame(top5causSCO)
+top5causSCO$Successors<-as.numeric(top5causSCO$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causSCO),]
+#top5sel[top5sel==0]<-NA
+top5causSCO$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+
+#MultiBC
+
+D3_data<-var_sect_country_time[19,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_BC.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020)
+            ts2<-ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020)
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+top5causBC<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causBC)<-c("Cty.Sect","Successors")
+top5causBC<-as.data.frame(top5causBC)
+top5causBC$Successors<-as.numeric(top5causBC$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causBC),]
+#top5sel[top5sel==0]<-NA
+top5causBC$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+#HOMO
+
+D3_data<-var_sect_country_time[4,,,]/var_sect_country_time[1,,,]
+data_melted<-melt(D3_data)
+colnames(data_melted)<-c("Sector","Country","Year","Value")
+sectors<-dimnames(var_sect_country_time)[[2]]
+countries<-dimnames(var_sect_country_time)[[3]]
+combinations<-unique(paste(data_melted$Country,data_melted$Sector,sep="."))
+
+p<-0.01
+FILENAME<-"data/CAUS_SECTCTRY_HOMO.RData"
+FILEEXISTS<-file.exists(FILENAME)
+if (FILEEXISTS==TRUE){
+  load(FILENAME)
+}else{
+  GRANGER_SECT_CTRY<-INSTANT_SECT_CTRY<-as.data.frame(matrix(0,nrow=length(combinations),ncol=length(combinations)))
+  colnames(GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)<-combinations
+  for (I in 1:dim(D3_data)[1]){
+    for (J in 1:dim(D3_data)[2]){
+      for (i in 1:dim(D3_data)[1]){
+        for (j in 1:dim(D3_data)[2]){
+          ts1Name=paste(dimnames(D3_data)[[2]][J],dimnames(D3_data)[[1]][I],sep=".")
+          ts2Name=paste(dimnames(D3_data)[[2]][j],dimnames(D3_data)[[1]][i],sep=".")
+          if (ts1Name!=ts2Name){
+            ts1<-na_interpolation(ts(as.numeric(as.matrix(D3_data[I,J,])),start=1995,end=2020))
+            ts2<-na_interpolation(ts(as.numeric(as.matrix(D3_data[i,j,])),start=1995,end=2020))
+            tsDat<-ts.union(ts1,ts2)
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_g<-try(as.numeric(causality(tsVAR, cause = "ts1")$Granger$p.value),silent = TRUE)
+              if (!is(p_g,"numeric")) {p_g<-1}
+              if (is.na(p_g)) {p_g<-1}
+              if (p_g<p){
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-k
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+            k<-1
+            while (TRUE)
+            {
+              tsVAR <- vars::VAR(tsDat, p = k)
+              p_i<-try(as.numeric(causality(tsVAR, cause = "ts1")$Instant$p.value),silent = TRUE)
+              if (!is(p_i,"numeric")) {p_i<-1}
+              if (is.na(p_i)) {p_i<-1}
+              if (p_i<p){
+                INSTANT_SECT_CTRY[ts1Name,ts2Name]<-1
+                GRANGER_SECT_CTRY[ts1Name,ts2Name]<-0
+                break
+              }
+              if (k>4){
+                break
+              }
+              k<-k+1
+            }
+          }
+        }
+      }
+    }
+  }
+  save(GRANGER_SECT_CTRY,INSTANT_SECT_CTRY,file = FILENAME)
+}
+
+BIN_GRANGER_SECT_CTRY<-matrix(as.numeric(GRANGER_SECT_CTRY>=1),nrow=nrow(GRANGER_SECT_CTRY),ncol=ncol(GRANGER_SECT_CTRY))
+colnames(BIN_GRANGER_SECT_CTRY)<-colnames(GRANGER_SECT_CTRY)
+rownames(BIN_GRANGER_SECT_CTRY)<-rownames(GRANGER_SECT_CTRY)
+BIN_INSTANT_SECT_CTRY<-matrix(as.numeric(INSTANT_SECT_CTRY>=1),nrow=nrow(INSTANT_SECT_CTRY),ncol=ncol(INSTANT_SECT_CTRY))
+colnames(BIN_INSTANT_SECT_CTRY)<-colnames(INSTANT_SECT_CTRY)
+rownames(BIN_INSTANT_SECT_CTRY)<-rownames(INSTANT_SECT_CTRY)
+top5causHMO<-cbind(names(head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5)),head(sort(rowSums(BIN_GRANGER_SECT_CTRY),decreasing = TRUE),n=5))
+colnames(top5causHMO)<-c("Cty.Sect","Successors")
+top5causHMO<-as.data.frame(top5causHMO)
+top5causHMO$Successors<-as.numeric(top5causHMO$Successors)
+top5sel<-GRANGER_SECT_CTRY[rownames(top5causHMO),]
+#top5sel[top5sel==0]<-NA
+top5causHMO$`Avg.Lag`<-round(rowMeans(top5sel,na.rm=TRUE),3)
+
+top5causDCI$Cty.Sect<-gsub("_","-",top5causDCI$Cty.Sect)
+top5causHMO$Cty.Sect<-gsub("_","-",top5causHMO$Cty.Sect)
+rownames(top5causDCI)<-paste(1:nrow(top5causDCI))
+rownames(top5causDCO)<-paste(1:nrow(top5causDCO))
+rownames(top5causHMO)<-paste(1:nrow(top5causHMO))
+DCITABLE<-tokable(top5causDCI,"(a) Most changes in import partners",escape=FALSE,fontsize=6)
+DCOTABLE<-tokable(top5causDCO,"(b) Most changes in export partners",escape=FALSE,fontsize=6)
+
+HMOTABLE<-tokable(top5causHMO,"(c) Most changes in homophily",escape=FALSE,fontsize=6)
+
+DCITABLE <- gsub("\\begin{table}", "\\begin{minipage}{0.32\\linewidth}", DCITABLE, fixed = TRUE)
+DCITABLE <- gsub("\\end{table}", "\\end{minipage}", DCITABLE, fixed = TRUE) 
+
+DCOTABLE <- gsub("\\begin{table}", "\\begin{minipage}{0.32\\linewidth}", DCOTABLE, fixed = TRUE)
+DCOTABLE <- gsub("\\end{table}", "\\end{minipage}\\\\", DCOTABLE, fixed = TRUE) 
+
+HMOTABLE <- gsub("\\begin{table}", "\\begin{minipage}{0.32\\linewidth}", HMOTABLE, fixed = TRUE)
+HMOTABLE <- gsub("\\end{table}", "\\end{minipage}\\\\", HMOTABLE, fixed = TRUE) 
+
+CAUSSECTOUT<-paste("","\\begin{table}[H]","\\tiny","\\centering","\\caption{\\label{tab:caustop5}Five countries/sectors whose trade is the first to respond to changes}",DCITABLE,DCOTABLE,HMOTABLE,"\\end{table}","",sep = "\n") 
+
+```
